@@ -28,12 +28,47 @@ integral_z = 0; integral_phi = 0; integral_theta = 0; integral_psi = 0;
     Kp_z, Ki_z, Kd_z, Kp_phi, Ki_phi, Kd_phi, ...
     Kp_theta, Ki_theta, Kd_theta, Kp_psi, Ki_psi, Kd_psi), tspan, X0);
 
-% Graficar la altitud
+% Grafica la altitud ,pitch , roll y yaw
 figure;
 plot(t, X(:, 3));
 xlabel('Tiempo (s)');
 ylabel('Altitud (m)');
 title('Altitud del Quadrotor');
+
+figure;
+subplot(3, 1, 1);
+plot(t, X(:, 4)); % Roll (phi)
+xlabel('Tiempo (s)');
+ylabel('Roll (rad)');
+title('Ángulo de Roll');
+
+subplot(3, 1, 2);
+plot(t, X(:, 5)); % Pitch (theta)
+xlabel('Tiempo (s)');
+ylabel('Pitch (rad)');
+title('Ángulo de Pitch');
+
+subplot(3, 1, 3);
+plot(t, X(:, 6)); % Yaw (psi)
+xlabel('Tiempo (s)');
+ylabel('Yaw (rad)');
+title('Ángulo de Yaw');
+
+% Grafica x y 
+figure;
+subplot(2, 1, 1);
+plot(t, X(:, 1)); % Posición en x
+xlabel('Tiempo (s)');
+ylabel('Posición x (m)');
+title('Posición en x');
+
+subplot(2, 1, 2);
+plot(t, X(:, 2)); % Posición en y
+xlabel('Tiempo (s)');
+ylabel('Posición y (m)');
+title('Posición en y');
+
+
 
 % Función de dinámica del quadrotor
 function dXdt = quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz, ...

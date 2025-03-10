@@ -85,9 +85,9 @@ function dXdt = quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz, ...
     dphi = X(10); dtheta = X(11); dpsi = X(12);
 
     % Estados deseados
-    z_des = 1; % Altitud deseada
-    phi_des = 0; % Roll deseado
-    theta_des = 0; % Pitch deseado
+    z_des = 5; % Altitud deseada
+    phi_des = pi/8; % Roll deseado
+    theta_des = pi/8; % Pitch deseado
     psi_des = 0; % Yaw deseado
 
     % Calcular errores

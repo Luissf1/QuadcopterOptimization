@@ -1,17 +1,22 @@
-% Parámetros físicos
-m = 1.0; % Masa (kg)
-g = 9.81; % Gravedad (m/s^2)
-Ix = 0.1; Iy = 0.1; Iz = 0.2; % Momentos de inercia (kg*m^2)
+% Parámetros 
+m = 1.0;          % Masa 
+g = 9.81;         % Gravedad 
+Ix = 0.1; Iy = 0.1; Iz = 0.2;  % Momentos de inercia 
 
 % Condiciones iniciales
-x0 = [0; 0; 0; 0; 0; 0]; % [x, y, z, phi, theta, psi]
-xdot0 = [0; 0; 0; 0; 0; 0]; % [dx, dy, dz, dphi, dtheta, dpsi]
+x0 = [0; 0; 0; 0; 0; 0];       % [x, y, z, Roll, Pitch, Yaw]
+xdot0 = [0; 0; 0; 0; 0; 0];    % Velocidades iniciales [dx, dy, dz, dRoll, dPitch, dYaw]
 
-% Ganchos PID para Z, Roll, Pitch, Yaw
-Kp_z = 10; Ki_z = 0.1; Kd_z = 5;
-Kp_phi = 5; Ki_phi = 0.01; Kd_phi = 1;
-Kp_theta = 5; Ki_theta = 0.01; Kd_theta = 1;
-Kp_psi = 5; Ki_psi = 0.01; Kd_psi = 1;
+% PID
+Kp_z = 10; Ki_z = 0.1; Kd_z = 5;          % Control de altitud
+Kp_phi = 5; Ki_phi = 0.01; Kd_phi = 1;    % Control de Roll
+Kp_theta = 5; Ki_theta = 0.01; Kd_theta = 1; % Control de Pitch
+Kp_psi = 5; Ki_psi = 0.01; Kd_psi = 1;    % Control de Yaw
+
+z_des = 5;          % Altitud deseada
+phi_des = pi/8;     % Roll deseado
+theta_des = pi/8;   % Pitch deseado
+psi_des = 0;        % Yaw deseado
 
 % Tiempo de simulación
 tspan = [0 10];
@@ -19,106 +24,86 @@ tspan = [0 10];
 % Estado inicial
 X0 = [x0; xdot0];
 
-% Variables para almacenar las integrales del error
+% Variables globales para integrales PID
 global integral_z integral_phi integral_theta integral_psi;
 integral_z = 0; integral_phi = 0; integral_theta = 0; integral_psi = 0;
 
-% Resolver las ecuaciones diferenciales
-[t, X] = ode45(@(t, X) quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz, ...
-    Kp_z, Ki_z, Kd_z, Kp_phi, Ki_phi, Kd_phi, ...
-    Kp_theta, Ki_theta, Kd_theta, Kp_psi, Ki_psi, Kd_psi), tspan, X0);
+% Resolver ecuaciones diferenciales (con valores deseados como parámetros)
+[t, X] = ode45(@(t, X) quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz,...
+    Kp_z, Ki_z, Kd_z, Kp_phi, Ki_phi, Kd_phi,...
+    Kp_theta, Ki_theta, Kd_theta, Kp_psi, Ki_psi, Kd_psi,...
+    z_des, phi_des, theta_des, psi_des), tspan, X0);
 
-% Grafica la altitud ,pitch , roll y yaw
+% Crear vectores de valores deseados
+z_des_vector = z_des * ones(size(t));
+phi_des_vector = phi_des * ones(size(t));
+theta_des_vector = theta_des * ones(size(t));
+psi_des_vector = psi_des * ones(size(t));
+
+% Graficar resultados (comparación deseado vs obtenido)
 figure;
-plot(t, X(:, 3));
-xlabel('Tiempo (s)');
-ylabel('Altitud (m)');
-title('Altitud del Quadrotor');
+subplot(2,2,1);
+plot(t, X(:,3), 'b', t, z_des_vector, 'r--', 'LineWidth', 1.5);
+xlabel('Tiempo (s)'); ylabel('Altitud (m)'); title('Altitud');
+legend('Obtenida', 'Deseada'); grid on;
 
-figure;
-subplot(3, 1, 1);
-plot(t, X(:, 4)); % Roll (phi)
-xlabel('Tiempo (s)');
-ylabel('Roll (rad)');
-title('Ángulo de Roll');
+subplot(2,2,2);
+plot(t, X(:,4), 'b', t, phi_des_vector, 'r--', 'LineWidth', 1.5);
+xlabel('Tiempo (s)'); ylabel('Roll (rad)'); title('Roll');
+legend('Obtenido', 'Deseado'); grid on;
 
-subplot(3, 1, 2);
-plot(t, X(:, 5)); % Pitch (theta)
-xlabel('Tiempo (s)');
-ylabel('Pitch (rad)');
-title('Ángulo de Pitch');
+subplot(2,2,3);
+plot(t, X(:,5), 'b', t, theta_des_vector, 'r--', 'LineWidth', 1.5);
+xlabel('Tiempo (s)'); ylabel('Pitch (rad)'); title('Pitch');
+legend('Obtenido', 'Deseado'); grid on;
 
-subplot(3, 1, 3);
-plot(t, X(:, 6)); % Yaw (psi)
-xlabel('Tiempo (s)');
-ylabel('Yaw (rad)');
-title('Ángulo de Yaw');
+subplot(2,2,4);
+plot(t, X(:,6), 'b', t, psi_des_vector, 'r--', 'LineWidth', 1.5);
+xlabel('Tiempo (s)'); ylabel('Yaw (rad)'); title('Yaw');
+legend('Obtenido', 'Deseado'); grid on;
 
-% Grafica x y 
-figure;
-subplot(2, 1, 1);
-plot(t, X(:, 1)); % Posición en x
-xlabel('Tiempo (s)');
-ylabel('Posición x (m)');
-title('Posición en x');
+% Función de dinámica actualizada
+function dXdt = quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz,...
+        Kp_z, Ki_z, Kd_z, Kp_phi, Ki_phi, Kd_phi,...
+        Kp_theta, Ki_theta, Kd_theta, Kp_psi, Ki_psi, Kd_psi,...
+        z_des, phi_des, theta_des, psi_des) % <-- Parámetros añadidos
 
-subplot(2, 1, 2);
-plot(t, X(:, 2)); % Posición en y
-xlabel('Tiempo (s)');
-ylabel('Posición y (m)');
-title('Posición en y');
-
-
-
-% Función de dinámica del quadrotor
-function dXdt = quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz, ...
-        Kp_z, Ki_z, Kd_z, Kp_phi, Ki_phi, Kd_phi, ...
-        Kp_theta, Ki_theta, Kd_theta, Kp_psi, Ki_psi, Kd_psi)
-
-    % Variables globales para las integrales del error
     global integral_z integral_phi integral_theta integral_psi;
-
+    
     % Extraer estados
-    x = X(1); y = X(2); z = X(3);
-    phi = X(4); theta = X(5); psi = X(6);
-    dx = X(7); dy = X(8); dz = X(9);
-    dphi = X(10); dtheta = X(11); dpsi = X(12);
-
-    % Estados deseados
-    z_des = 5; % Altitud deseada
-    phi_des = pi/8; % Roll deseado
-    theta_des = pi/8; % Pitch deseado
-    psi_des = 0; % Yaw deseado
-
-    % Calcular errores
-    error_z = z_des - z;
-    error_phi = phi_des - phi;
-    error_theta = theta_des - theta;
-    error_psi = psi_des - psi;
-
-    % Actualizar las integrales del error
-    integral_z = integral_z + error_z;
-    integral_phi = integral_phi + error_phi;
-    integral_theta = integral_theta + error_theta;
-    integral_psi = integral_psi + error_psi;
-
-    % Control PID para Z
-    U1 = Kp_z * error_z + Ki_z * integral_z + Kd_z * (0 - dz);
-
-    % Control PID para Roll, Pitch, Yaw
-    U2 = Kp_phi * error_phi + Ki_phi * integral_phi + Kd_phi * (0 - dphi);
-    U3 = Kp_theta * error_theta + Ki_theta * integral_theta + Kd_theta * (0 - dtheta);
-    U4 = Kp_psi * error_psi + Ki_psi * integral_psi + Kd_psi * (0 - dpsi);
-
-    % Ecuaciones de movimiento
-    ddx = (cos(phi)*sin(theta)*cos(psi) + sin(phi)*sin(psi)) * U1 / m;
-    ddy = (cos(phi)*sin(theta)*sin(psi) - sin(phi)*cos(psi)) * U1 / m;
-    ddz = (cos(phi)*cos(theta)) * U1 / m - g;
-
-    ddphi = (U2 + (Iy - Iz)*dtheta*dpsi) / Ix;
-    ddtheta = (U3 + (Iz - Ix)*dphi*dpsi) / Iy;
-    ddpsi = (U4 + (Ix - Iy)*dphi*dtheta) / Iz;
-
-    % Retornar derivadas
-    dXdt = [dx; dy; dz; dphi; dtheta; dpsi; ddx; ddy; ddz; ddphi; ddtheta; ddpsi];
+    pos = X(1:6);       % [x, y, z, ϕ, θ, ψ]
+    vel = X(7:12);      % [dx, dy, dz, dϕ, dθ, dψ]
+    
+    % Cálculo de errores (usa los parámetros z_des, phi_des, etc.)
+    errores = [z_des - pos(3);    % Error altitud
+              phi_des - pos(4);   % Error Roll
+              theta_des - pos(5); % Error Pitch
+              psi_des - pos(6)];  % Error Yaw
+    
+    % Actualizar integrales
+    integral_z = integral_z + errores(1);
+    integral_phi = integral_phi + errores(2);
+    integral_theta = integral_theta + errores(3);
+    integral_psi = integral_psi + errores(4);
+    
+    % Control PID (usando los errores calculados)
+    U1 = Kp_z*errores(1) + Ki_z*integral_z + Kd_z*(-vel(3));
+    U2 = Kp_phi*errores(2) + Ki_phi*integral_phi + Kd_phi*(-vel(4));
+    U3 = Kp_theta*errores(3) + Ki_theta*integral_theta + Kd_theta*(-vel(5));
+    U4 = Kp_psi*errores(4) + Ki_psi*integral_psi + Kd_psi*(-vel(6));
+    
+    % Dinámica traslacional
+    acc_lin = [...
+        (cos(pos(4))*sin(pos(5))*cos(pos(6)) + sin(pos(4))*sin(pos(6)))*U1/m;
+        (cos(pos(4))*sin(pos(5))*sin(pos(6)) - sin(pos(4))*cos(pos(6)))*U1/m;
+        (cos(pos(4))*cos(pos(5))*U1/m) - g];
+    
+    % Dinámica rotacional
+    acc_ang = [...
+        (U2 + (Iy - Iz)*vel(5)*vel(6))/Ix;
+        (U3 + (Iz - Ix)*vel(4)*vel(6))/Iy;
+        (U4 + (Ix - Iy)*vel(4)*vel(5))/Iz];
+    
+    % Vector de derivadas
+    dXdt = [vel; acc_lin; acc_ang];
 end

@@ -13,9 +13,9 @@ Kp_phi = 5; Ki_phi = 0.01; Kd_phi = 1;    % Control de Roll
 Kp_theta = 5; Ki_theta = 0.01; Kd_theta = 1; % Control de Pitch
 Kp_psi = 5; Ki_psi = 0.01; Kd_psi = 1;    % Control de Yaw
 
-z_des = 5;          % Altitud deseada
-phi_des = pi/8;     % Roll deseado
-theta_des = pi/8;   % Pitch deseado
+z_des = 1;          % Altitud deseada
+phi_des = pi/4;     % Roll deseado
+theta_des = pi/4;   % Pitch deseado
 psi_des = 0;        % Yaw deseado
 
 % Tiempo de simulación

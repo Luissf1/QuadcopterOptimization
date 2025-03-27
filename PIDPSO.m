@@ -157,7 +157,7 @@ function fitness = pid_objective_function(ganancias)
     tspan = [0 10];
     
     % Valores deseados (pueden modificarse)
-    z_des = 1; 
+    z_des = 5; 
     phi_des = pi/4; 
     theta_des = pi/4; 
     psi_des = 0;

@@ -55,7 +55,7 @@ title('Yaw (ψ)'); xlabel('Tiempo'); ylabel('rad');
 function [global_best, B] = optimize_pid_with_pso()
     % Parámetros del PSO
     nVar = 12; % 4 controladores × 3 parámetros (Kp, Ki, Kd)
-    VarMin = [0.1  0.001  0.1 ...  % Límites para z (Kp, Ki, Kd)
+    VarMin = [1.0  0.005  0.05 ...  % Límites para z (Kp, Ki, Kd)
               0.1  0.001  0.1 ...  % para phi
               0.1  0.001  0.1 ...  % para theta
               0.1  0.001  0.1];    % para psi
@@ -65,7 +65,7 @@ function [global_best, B] = optimize_pid_with_pso()
               10   0.1   5 ...     % para theta
               10   0.1   5];       % para psi
 
-    MaxIter = 30;  % Iteraciones (reducido por tiempo)
+    MaxIter = 30;  % Iteraciones 
     nPop = 15;     % Población
     w = 1;         % Inercia inicial
     d = 0.98;      % Factor de decremento
@@ -157,7 +157,7 @@ function fitness = pid_objective_function(ganancias)
     tspan = [0 10];
     
     % Valores deseados (pueden modificarse)
-    z_des = 5; 
+    z_des = 3; 
     phi_des = pi/4; 
     theta_des = pi/4; 
     psi_des = 0;

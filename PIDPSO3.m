@@ -1,16 +1,16 @@
 % Parámetros del quadrotor
-m = 1.0;           % Masa (kg)
-g = 9.81;          % Gravedad (m/s^2)
-Ix = 0.1; Iy = 0.1; Iz = 0.2;  % Inercias (kg·m^2)
+m = 1.0;           % Masa 
+g = 9.81;          % Gravedad
+Ix = 0.1; Iy = 0.1; Iz = 0.2;  % Inercias 
 
 % Valores deseados
-z_des = 5;         % Altura deseada (m)
-phi_des = pi/4;    % Ángulo roll deseado (rad)
-theta_des = pi/4;  % Ángulo pitch deseado (rad)
-psi_des = 0;       % Ángulo yaw deseado (rad)
+z_des = 5;         % Altura deseada 
+phi_des = pi/4;    % Ángulo roll deseado 
+theta_des = pi/4;  % Ángulo pitch deseado
+psi_des = 0;       % Ángulo yaw deseado 
 
 % Tiempo de simulación
-tspan = [0 10];    % Tiempo inicial y final (s)
+tspan = [0 10];    % Tiempo inicial y final 
 
 %% ================= OPTIMIZACIÓN PSO =================
 [mejores_ganancias, convergencia] = optimizar_pid();
@@ -155,7 +155,7 @@ end
 function fitness = evaluar_pid(ganancias)
     % Parámetros fijos (podrían pasarse como argumento)
     m = 1.0; g = 9.81; Ix = 0.1; Iy = 0.1; Iz = 0.2;
-    z_des = 3; phi_des = pi/4; theta_des = pi/4; psi_des = 0;
+    z_des = 5; phi_des = pi/4; theta_des = pi/4; psi_des = 0;
     tspan = [0 10];
     X0 = zeros(12,1);
     

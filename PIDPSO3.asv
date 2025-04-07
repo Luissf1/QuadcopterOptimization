@@ -1,17 +1,16 @@
-%% ================= CONFIGURACIÓN PRINCIPAL =================
 % Parámetros del quadrotor
-m = 1.0;           % Masa (kg)
-g = 9.81;          % Gravedad (m/s^2)
-Ix = 0.1; Iy = 0.1; Iz = 0.2;  % Inercias (kg·m^2)
+m = 1.0;           % Masa 
+g = 9.81;          % Gravedad
+Ix = 0.1; Iy = 0.1; Iz = 0.2;  % Inercias 
 
 % Valores deseados
-z_des = 1;         % Altura deseada (m)
-phi_des = pi/4;    % Ángulo roll deseado (rad)
-theta_des = pi/4;  % Ángulo pitch deseado (rad)
-psi_des = 0;       % Ángulo yaw deseado (rad)
+z_des = 5;         % Altura deseada 
+phi_des = pi/4;    % Ángulo roll deseado 
+theta_des = pi/4;  % Ángulo pitch deseado
+psi_des = 0;       % Ángulo yaw deseado 
 
 % Tiempo de simulación
-tspan = [0 10];    % Tiempo inicial y final (s)
+tspan = [0 10];    % Tiempo inicial y final 
 
 %% ================= OPTIMIZACIÓN PSO =================
 [mejores_ganancias, convergencia] = optimizar_pid();
@@ -57,7 +56,7 @@ function simular_con_ganancias(ganancias, m, g, I, deseado, tspan)
     
     % Altura (z)
     subplot(2,2,1);
-    plot(t, X(:,3), hold on, plot(t, z_des*ones(size(t)), 'r--');
+    plot(t, X(:,3)), hold on, plot(t, z_des*ones(size(t)), 'r--');
     title('Altura (z)'); xlabel('Tiempo (s)'); ylabel('m');
     legend('Real', 'Deseado');
     
@@ -77,11 +76,11 @@ function simular_con_ganancias(ganancias, m, g, I, deseado, tspan)
     title('Yaw (ψ)'); xlabel('Tiempo (s)'); ylabel('rad');
 end
 
-%% ================= ALGORITMO PSO SIMPLIFICADO =================
+%% ================= ALGORITMO PSO =================
 function [mejor_ganancia, convergencia] = optimizar_pid()
     % Configuración del PSO
     n_variables = 12;  % 4 controladores × 3 parámetros (Kp, Ki, Kd)
-    iteraciones = 30;   % Número de iteraciones
+    iteraciones = 15;   % Número de iteraciones
     poblacion = 15;     % Tamaño de la población
     
     % Límites para los parámetros PID
@@ -162,7 +161,7 @@ function fitness = evaluar_pid(ganancias)
     
     try
         % Simular sistema
-        [t, X] = ode45(@(t,X) dinámica_quadrotor(t, X, m, g, Ix, Iy, Iz, ...
+        [t, X] = ode45(@(t,X) dinamica_quadrotor(t, X, m, g, Ix, Iy, Iz, ...
                         ganancias, [z_des, phi_des, theta_des, psi_des]), tspan, X0);
         
         % Calcular errores
@@ -187,7 +186,7 @@ function fitness = evaluar_pid(ganancias)
 end
 
 %% ================= DINÁMICA DEL QUADROTOR =================
-function dXdt = dinámica_quadrotor(~, X, m, g, Ix, Iy, Iz, ganancias, deseado)
+function dXdt = dinamica_quadrotor(~, X, m, g, Ix, Iy, Iz, ganancias, deseado)
     % Extraer estados
     pos = X(1:6);   % [x, y, z, φ, θ, ψ]
     vel = X(7:12);   % Velocidades lineales y angulares

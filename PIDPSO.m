@@ -25,7 +25,7 @@ Kp_psi = optimal_gains(10); Ki_psi = optimal_gains(11); Kd_psi = optimal_gains(1
 m = 1.0; g = 9.81; Ix = 0.1; Iy = 0.1; Iz = 0.2;
 x0 = zeros(6,1); xdot0 = zeros(6,1); X0 = [x0; xdot0];
 tspan = [0 10];
-z_des = 1; phi_des = pi/4; theta_des = pi/4; psi_des = 0;
+z_des = 5; phi_des = pi/4; theta_des = pi/4; psi_des = 0;
 
 % Simular
 [t, X] = ode45(@(t,X) quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz,...
@@ -55,22 +55,31 @@ title('Yaw (ψ)'); xlabel('Tiempo'); ylabel('rad');
 function [global_best, B] = optimize_pid_with_pso()
     % Parámetros del PSO
     nVar = 12; % 4 controladores × 3 parámetros (Kp, Ki, Kd)
-    VarMin = [1.0  0.005  0.05 ...  % Límites para z (Kp, Ki, Kd)
-              0.1  0.001  0.1 ...  % para phi
-              0.1  0.001  0.1 ...  % para theta
-              0.1  0.001  0.1];    % para psi
+    % VarMin = [1.0  0.005  0.05 ...  % Límites para z (Kp, Ki, Kd)
+    %           0.1  0.001  0.1 ...  % para phi
+    %           0.1  0.001  0.1 ...  % para theta
+    %           0.1  0.001  0.1];    % para psi
+    % 
+    % VarMax = [20   1     10 ...     % Límites para z
+    %           10   0.1   5 ...     % para phi
+    %           10   0.1   5 ...     % para theta
+    %           10   0.1   5];       % para psi
+      VarMin = [2.0  0.01  0.1 ... 
+              0.1  0.001  0.1 ...  
+              0.1  0.001  0.1 ...  
+              0.1  0.001  0.1];    
           
-    VarMax = [20   1     10 ...     % Límites para z
-              10   0.1   5 ...     % para phi
-              10   0.1   5 ...     % para theta
-              10   0.1   5];       % para psi
-
-    MaxIter = 30;  % Iteraciones 
-    nPop = 15;     % Población
-    w = 1;         % Inercia inicial
-    d = 0.98;      % Factor de decremento
-    c1 = 2.5;      % Cognitivo
-    c2 = 1.5;      % Social
+      VarMax = [15   2.0   5 ...    
+              10   0.1   2 ...    
+              10   0.1   2 ...    
+              10   0.1   2]; 
+    
+    MaxIter = 100;  % Iteraciones 
+    nPop = 50;     % Población
+    w = .7;         % Inercia inicial
+    d = 0.97;      % Factor de decremento
+    c1 = 1.7;      % Cognitivo
+    c2 = 1.7;      % Social
 
     % Inicialización
     empty_particle.position = [];
@@ -183,18 +192,23 @@ function fitness = pid_objective_function(ganancias)
         
         % Penalización por sobreimpulso
         overshoot_penalty = 0;
-        if any(X(:,3) > z_des*1.2)  % 20% overshoot
-            overshoot_penalty = 100;
+        max_overshoot = max(0, max(X(:,3)) - z_des);
+        if max_overshoot > 0
+            overshoot_penalty = 10 * max_overshoot; % Más gradual
         end
-        
+         
+        steady_state_error = mean(error_z(end-100:end)) + ...
+                            mean(error_phi(end-100:end)) + ...
+                            mean(error_theta(end-100:end)) + ...
+                            mean(error_psi(end-100:end));
+
         % Fitness combinado
         fitness = trapz(t, t.*error_z) + trapz(t, t.*error_phi) + ...
                  trapz(t, t.*error_theta) + trapz(t, t.*error_psi) + ...
-                 overshoot_penalty;
+                 overshoot_penalty + 10*steady_state_error;
              
     catch
-        % En caso de error en simulación (ganancias inestables)
-        fitness = 1e6; % Penalización alta
+        fitness = 1e4 + norm(ganancias);
     end
 end
 

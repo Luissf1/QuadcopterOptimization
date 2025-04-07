@@ -80,12 +80,18 @@ end
 function [mejor_ganancia, convergencia] = optimizar_pid()
     % Configuración del PSO
     n_variables = 12;  % 4 controladores × 3 parámetros (Kp, Ki, Kd)
-    iteraciones = 15;   % Número de iteraciones
-    poblacion = 15;     % Tamaño de la población
+    iteraciones = 100;   % Número de iteraciones
+    poblacion = 50;     % Tamaño de la población
     
     % Límites para los parámetros PID
-    limites_min = [1.0  0.005  0.05  0.1  0.001  0.1  0.1  0.001  0.1  0.1  0.001  0.1];
-    limites_max = [20   1     10    10   0.1    5    10   0.1    5    10   0.1    5];
+    limites_min =  [2.0  0.01  0.1 ... 
+              0.1  0.001  0.1 ...  
+              0.1  0.001  0.1 ...  
+              0.1  0.001  0.1];  
+    limites_max =  [15   2.0   5 ...    
+              10   0.1   2 ...    
+              10   0.1   2 ...    
+              10   0.1   2];
     
     % Inicialización
     mejor_ganancia.posicion = [];
@@ -106,8 +112,8 @@ function [mejor_ganancia, convergencia] = optimizar_pid()
     end
     
     % Parámetros PSO
-    inercia = 1.0;       % Peso de la velocidad anterior
-    c1 = 2.5; c2 = 1.5;  % Factores cognitivo y social
+    inercia = .7;       % Peso de la velocidad anterior
+    c1 = 1.7; c2 = 1.7;  % Factores cognitivo y social
     
     % Bucle principal
     for iter = 1:iteraciones
@@ -141,7 +147,7 @@ function [mejor_ganancia, convergencia] = optimizar_pid()
         end
         
         % Reducir inercia
-        inercia = inercia * 0.98;
+        inercia = inercia * 0.97;
         
         % Guardar mejor fitness
         convergencia(iter) = mejor_ganancia.fitness;
@@ -153,7 +159,6 @@ end
 
 %% ================= FUNCIÓN DE EVALUACIÓN =================
 function fitness = evaluar_pid(ganancias)
-    % Parámetros fijos (podrían pasarse como argumento)
     m = 1.0; g = 9.81; Ix = 0.1; Iy = 0.1; Iz = 0.2;
     z_des = 5; phi_des = pi/4; theta_des = pi/4; psi_des = 0;
     tspan = [0 10];

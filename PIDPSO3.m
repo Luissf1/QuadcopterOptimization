@@ -4,7 +4,7 @@ g = 9.81;          % Gravedad [m/s²]
 Ix = 0.1; Iy = 0.1; Iz = 0.2;  % Momentos de inercia [kg·m²]
 
 % Valores deseados
-z_des = 5;         % Altura deseada [m]
+z_des = 10;         % Altura deseada [m]
 phi_des = pi/4;    % Ángulo roll deseado [rad]
 theta_des = pi/4;  % Ángulo pitch deseado [rad]
 psi_des = 0;       % Ángulo yaw deseado [rad]
@@ -182,7 +182,7 @@ function fitness = evaluar_pid(ganancias)
     tspan = [0 10];
     
     % Valores deseados
-    z_des = 5; 
+    z_des = 10; 
     phi_des = pi/4; 
     theta_des = pi/4; 
     psi_des = 0;

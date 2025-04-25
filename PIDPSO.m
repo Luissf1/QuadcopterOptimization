@@ -1,3 +1,4 @@
+close all
 %% Optimización y mostrar resultados
 [global_best, convergence] = optimize_pid_with_pso();
 

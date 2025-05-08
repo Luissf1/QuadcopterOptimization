@@ -26,8 +26,8 @@ psi_des = 0;      % Ángulo de yaw deseado [rad]
 % Estos son los valores que se mantienen constantes durante la simulación
 Kp_z = 8.5698; Ki_z = 1.006; Kd_z = 4.9995;          % Control de altitud
 Kp_phi = 5.6587; Ki_phi = 0.025; Kd_phi = 1.1393;    % Control de Roll
-Kp_theta = 10; Ki_theta = 0.1; Kd_theta = 1.016; % Control de Pitch
-Kp_psi =3.4006; Ki_psi = 0.1; Kd_psi = 1.5727;    % Control de Yaw
+Kp_theta = 10; Ki_theta = 0.001; Kd_theta = 2; % Control de Pitch
+Kp_psi =10; Ki_psi = 0.001; Kd_psi = 1.2917;    % Control de Yaw
 
 %% Variables globales para integrales PID
 global integral_z integral_phi integral_theta integral_psi;

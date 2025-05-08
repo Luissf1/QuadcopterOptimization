@@ -26,7 +26,7 @@ Kp_psi = optimal_gains(10); Ki_psi = optimal_gains(11); Kd_psi = optimal_gains(1
 m = 1.0; g = 9.81; Ix = 0.1; Iy = 0.1; Iz = 0.2;
 x0 = zeros(6,1); xdot0 = zeros(6,1); X0 = [x0; xdot0];
 tspan = [0 10];
-z_des = 1; phi_des = 0.2; theta_des = 0.1; psi_des = 0;
+z_des = 1; phi_des = 0; theta_des = 0; psi_des = pi/4;
 
 % Simular
 [t, X] = ode45(@(t,X) quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz,...
@@ -168,9 +168,9 @@ function fitness = pid_objective_function(ganancias)
     
     % Valores deseados 
     z_des = 1; 
-    phi_des = 0.2; 
-    theta_des = 0.1; 
-    psi_des = 0;
+    phi_des = 0; 
+    theta_des = 0; 
+    psi_des = pi/4;
     
     % Desempaquetar ganancias
     Kp_z = ganancias(1); Ki_z = ganancias(2); Kd_z = ganancias(3);

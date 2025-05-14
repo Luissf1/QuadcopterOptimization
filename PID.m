@@ -14,8 +14,8 @@ Kp_theta = 5; Ki_theta = 0.01; Kd_theta = 1; % Control de Pitch
 Kp_psi = 5; Ki_psi = 0.01; Kd_psi = 1;    % Control de Yaw
 
 z_des = 1;          % Altitud deseada
-phi_des = 0.2;     % Roll deseado
-theta_des = 0.1;   % Pitch deseado
+phi_des = 0;     % Roll deseado
+theta_des = 0;   % Pitch deseado
 psi_des = 0;        % Yaw deseado
 
 % Tiempo de simulación
@@ -45,7 +45,7 @@ figure;
 subplot(2,2,1);
 plot(t, X(:,3), 'b', t, z_des_vector, 'r--', 'LineWidth', 1.5);
 xlabel('Tiempo (s)'); ylabel('Altitud (m)'); title('Altitud');
-legend('Obtenida', 'Deseada'); grid on;
+legend('Obtenido', 'Deseada'); grid on;
 
 subplot(2,2,2);
 plot(t, X(:,4), 'b', t, phi_des_vector, 'r--', 'LineWidth', 1.5);

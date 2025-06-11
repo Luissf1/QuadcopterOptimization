@@ -114,6 +114,45 @@ title('Yaw con PID Ziegler-Nichols');
 xlabel('Tiempo (s)'); ylabel('Yaw (rad)');
 legend('Salida','Deseado'); grid on;
 
+% --- PASO 5: Métricas de desempeño para altitud ---
+z = X(:,3);
+error_z = z_des - z;
+
+% Overshoot (%)
+overshoot = (max(z) - z_des) / z_des * 100;
+
+% MSE (Mean Squared Error)
+mse = mean((z - z_des).^2);
+
+% Tiempo de establecimiento (±5%)
+tolerance = 0.05 * z_des;
+idx_settle = find(abs(z - z_des) > tolerance);
+if isempty(idx_settle)
+    settling_time = 0;
+else
+    settling_time = t(find(abs(z - z_des) > tolerance, 1, 'last'));
+end
+
+% Tiempo de subida (10% a 90%)
+rise_start = z_des * 0.1;
+rise_end = z_des * 0.9;
+try
+    t_rise_start = t(find(z >= rise_start, 1));
+    t_rise_end = t(find(z >= rise_end, 1));
+    rise_time = t_rise_end - t_rise_start;
+catch
+    rise_time = NaN; % No se detectó subida completa
+end
+
+% Mostrar resultados
+fprintf('\n--- MÉTRICAS PARA ALTITUD (z) ---\n');
+fprintf('Kp = %.2f, Ki = %.2f, Kd = %.2f\n', Kp_z, Ki_z, Kd_z);
+fprintf('Overshoot: %.2f %%\n', overshoot);
+fprintf('MSE: %.5f\n', mse);
+fprintf('Tiempo de establecimiento: %.2f s\n', settling_time);
+fprintf('Tiempo de subida: %.2f s\n', rise_time);
+
+
 function dXdt = quadrotor_dynamics(t, X, m, g, Ix, Iy, Iz,...
         Kp_z, Ki_z, Kd_z, Kp_phi, Ki_phi, Kd_phi,...
         Kp_theta, Ki_theta, Kd_theta, Kp_psi, Ki_psi, Kd_psi,...

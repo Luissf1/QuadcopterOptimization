@@ -250,7 +250,9 @@ class PSODynamics:
         return dXdt
 
 def evaluate_pid_improved(gains, z_des, phi_des, theta_des, psi_des):
-    """Función de evaluación mejorada"""
+    """Función de evaluac
+    
+    ión mejorada"""
     dynamics = PSODynamics()
     
     try:

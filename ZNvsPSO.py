@@ -12,10 +12,6 @@ import seaborn as sns
 plt.style.use('seaborn-v0_8-whitegrid')
 sns.set_palette("husl")
 
-# =============================================================================
-# ZIEGLER-NICHOLS MODULE (CORRECTED - MAINTAINING PREVIOUS VERSION)
-# =============================================================================
-
 class ZNController:
     """ZN Controller with internal state management"""
     def __init__(self):
